@@ -63,6 +63,62 @@ public class CalcImplementation //implements calc
 		
 	}
 	
+	public void otherTranslateInput()
+	{
+		Pattern pattern = Pattern.compile("[-]?[0-9]*\\.?[0-9]+");
+		Matcher m = pattern.matcher(input);
+		int posNonDigit = 0;
+		int posBracket = 0;
+		int forError;
+		
+		for (int i = 0; i < input.length(); i++)
+		{
+			if (input.charAt(i) == '(')
+				posBracket++;
+			else
+				break;
+		}
+		
+		if (posBracket != 0)
+			makedInput.add(input.substring(0, posBracket));
+	m.find();
+	forError = m.start();
+	if (forError == posBracket)
+		{
+			while (posNonDigit < input.length())
+			{
+				if (m.find(posNonDigit))
+				{
+					makedInput.add(input.substring(m.start(), m.end()));
+					posNonDigit = m.end();
+				if (m.find(posNonDigit) && ((m.start() - posNonDigit) >= 1))
+				{
+					makedInput.add(input.substring(posNonDigit, m.start()));
+					posNonDigit = m.start();
+				}
+				else
+					if (m.find(posNonDigit) && input.substring(posNonDigit, posNonDigit + 1).equals("-"))
+					{
+						makedInput.add("-");
+						posNonDigit++;
+					}
+				}
+				else
+				{
+					if (input.substring(posNonDigit, input.length()).startsWith(")"))
+						makedInput.add(input.substring(posNonDigit, input.length()));
+					break;
+				}
+			}
+		}
+	else
+		{
+			errorInInput = true;
+			String s = input.substring(0, posBracket) + " Error->" + input.substring(posBracket, forError) + "<-Error " + input.substring(forError, input.length());
+			JOptionPane.showMessageDialog(null, s);
+		}
+	}
+	
 	public void getTranslateInput()
 	{
 		if (!errorInInput)

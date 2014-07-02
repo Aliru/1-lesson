@@ -7,7 +7,8 @@ public class CalcApp {
 		CalcImplementation ci = new CalcImplementation();
 		//2+(3-1)+(3+(45-3))
 		ci.getUserInput();
-		ci.translateInput();
+		//ci.translateInput();
+		ci.otherTranslateInput();
 		ci.getTranslateInput();
 		ci.reversePolishNotation();
 		ci.getReversePolishNotation();
