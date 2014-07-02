@@ -13,6 +13,7 @@ public class CalcImplementation //implements calc
 	private  ArrayList <String> makedInput = new ArrayList <String>();
 	private  ArrayList <String> output = new ArrayList <String>();
 	private ArrayList <String> stack = new ArrayList <String>();
+	private boolean errorInInput = false;
 	
 	public void getUserInput()
 	{
@@ -24,31 +25,65 @@ public class CalcImplementation //implements calc
 		Pattern pattern = Pattern.compile("[+-]?[0-9]*\\.?[0-9]+");
 		Matcher m = pattern.matcher(input);
 		int posNonDigit = 0;
+		int posBracket = 0;
+		int forError;
 		
-		while(m.find(posNonDigit))
-		{
-			makedInput.add(input.substring(m.start(), m.end()));
-			posNonDigit = m.end();
-			System.out.println(input.substring(m.start(), m.end()));
-			System.out.println(posNonDigit + "!!!!!!!");
-			while( (posNonDigit < input.length()) && (!Character.isDigit(input.charAt(posNonDigit))))
+			for (int i = 0; i < input.length(); i++)
 			{
-				posNonDigit++;
+				if (input.charAt(i) == '(')
+					posBracket++;
+				else
+					break;
 			}
-			//2+(3-1)*(3+(45-3)-9/7)
-			makedInput.add(input.substring(m.end() ,posNonDigit));
+			
+			if (posBracket != 0)
+				makedInput.add(input.substring(0, posBracket));
+		m.find();
+		forError = m.start();
+		if (forError == posBracket)
+			while(m.find(posNonDigit))
+			{
+					makedInput.add(input.substring(m.start(), m.end()));
+					posNonDigit = m.end();
+					System.out.println(input.substring(m.start(), m.end()));
+					System.out.println(posNonDigit + "!!!!!!!");
+					while( (posNonDigit < input.length()) && (!Character.isDigit(input.charAt(posNonDigit))))
+					{
+						posNonDigit++;
+					}
+					//2+(3-1)*(3+(45-3)-9/7)
+					makedInput.add(input.substring(m.end() ,posNonDigit));
+			}
+		else
+		{
+			errorInInput = true;
+			String s = input.substring(0, posBracket) + " Error->" + input.substring(posBracket, forError) + "<-Error " + input.substring(forError, input.length());
+			JOptionPane.showMessageDialog(null, s);
 		}
 		
 	}
 	
 	public void getTranslateInput()
 	{
-		System.out.println(makedInput);
+		if (!errorInInput)
+			System.out.println(makedInput);
 	}
 	
 	public void reversePolishNotation()
 	{
-		for (int i = 0; i < makedInput.size(); i += 2)
+		if (!errorInInput)
+		{
+		int i = 0;
+		if (makedInput.get(0).startsWith("("))
+		{
+			for (int j = 0; j < makedInput.get(0).length(); j++)
+			{
+				stack.add("(");
+			}
+			i++;
+		}
+		System.out.println(stack);
+		for ( ; i < makedInput.size(); i += 2)
 		{
 			output.add(makedInput.get(i));
 			if ((i + 1) < makedInput.size())
@@ -123,6 +158,7 @@ public class CalcImplementation //implements calc
 						System.out.println("Error");
 					else
 					{
+						System.out.println(stack);
 						int j = stack.size() - 1;
 						while (!stack.get(j).equals("("))
 						{
@@ -143,93 +179,106 @@ public class CalcImplementation //implements calc
 		}
 		if (!stack.isEmpty())
 		{
-			for (int i = stack.size() - 1; i >= 0; i--)
+			for (i = stack.size() - 1; i >= 0; i--)
 			{
 				output.add(stack.get(i));
 			}
+		}
 		}
 	}
 	
 	public void getReversePolishNotation()
 	{
+		if (!errorInInput)
 		System.out.println(output);
 	}
 	
 	public void makeResult()
 	{
-		int i = 0;
-		
-		while (output.size() > 1)
+		if (!errorInInput)
 		{
-			Pattern pattern = Pattern.compile("[-+^*/]+");
-			Matcher m = pattern.matcher(output.get(i));
-			if (m.find())
+			int i = 0;
+			while (output.size() > 1)
 			{
-				System.out.println(output.get(i).length());
-				switch (m.group())
+				Pattern pattern = Pattern.compile("[-+^*/]+");
+				Matcher m = pattern.matcher(output.get(i));
+				if (m.find())
 				{
-				
-				case "+":
-					this.getReversePolishNotation();
-					double d1 = 0;
-					d1 += (Double.parseDouble(output.get(i - 2)) + Double.parseDouble(output.get(i - 1)));
-					String s1 = "" + d1;
-					output.remove(i);
-					output.remove(i - 1);
-					output.remove(i - 2);
-					output.add(i - 2, s1);
-					output.trimToSize();
-					i = 0;
-					break;
-				case "-":
-					this.getReversePolishNotation();
-					double d2 = 0;
-					d2 += (Double.parseDouble(output.get(i - 2)) - Double.parseDouble(output.get(i - 1)));
-					String s2 = "" + d2;
-					output.remove(i);
-					output.remove(i - 1);
-					output.remove(i - 2);
-					output.add(i - 2, s2);
-					output.trimToSize();
-					i = 0;
-					break;
-				case "/":
-					double d3 = 0;
-					d3 += (Double.parseDouble(output.get(i - 2)) / Double.parseDouble(output.get(i - 1)));
-					String s3 = "" + d3;
-					output.remove(i);
-					output.remove(i - 1);
-					output.remove(i - 2);
-					output.add(i - 2, s3);
-					output.trimToSize();
-					i = 0;
-					break;
-				case "*":
-					double d4 = 0;
-					d4 += (Double.parseDouble(output.get(i - 2)) * Double.parseDouble(output.get(i - 1)));
-					String s4 = "" + d4;
-					output.remove(i);
-					output.remove(i - 1);
-					output.remove(i - 2);
-					output.add(i - 2, s4);
-					output.trimToSize();
-					i = 0;
-					break;
-					default:
-						//System.out.println("Titssss");
+					//System.out.println(output.get(i).length());
+					switch (m.group())
+					{
+					
+					case "+":
+						this.getReversePolishNotation();
+						double d1 = 0;
+						d1 += (Double.parseDouble(output.get(i - 2)) + Double.parseDouble(output.get(i - 1)));
+						String s1 = "" + d1;
+						output.remove(i);
+						output.remove(i - 1);
+						output.remove(i - 2);
+						output.add(i - 2, s1);
+						output.trimToSize();
+						i = 0;
 						break;
+					case "-":
+						//check for case -1, -2 ...
+						if (output.get(i).length() == 1)
+						{
+							this.getReversePolishNotation();
+							double d2 = 0;
+							d2 += (Double.parseDouble(output.get(i - 2)) - Double.parseDouble(output.get(i - 1)));
+							String s2 = "" + d2;
+							output.remove(i);
+							output.remove(i - 1);
+							output.remove(i - 2);
+							output.add(i - 2, s2);
+							output.trimToSize();
+							i = 0;
+						}
+						else
+							i++;
+						break;
+					case "/":
+						double d3 = 0;
+						d3 += (Double.parseDouble(output.get(i - 2)) / Double.parseDouble(output.get(i - 1)));
+						String s3 = "" + d3;
+						output.remove(i);
+						output.remove(i - 1);
+						output.remove(i - 2);
+						output.add(i - 2, s3);
+						output.trimToSize();
+						i = 0;
+						break;
+					case "*":
+						double d4 = 0;
+						d4 += (Double.parseDouble(output.get(i - 2)) * Double.parseDouble(output.get(i - 1)));
+						String s4 = "" + d4;
+						output.remove(i);
+						output.remove(i - 1);
+						output.remove(i - 2);
+						output.add(i - 2, s4);
+						output.trimToSize();
+						i = 0;
+						break;
+						default:
+							//System.out.println("Titssss");
+							break;
+					}
 				}
-			}
-			else
-				i++;
-			}
-		result = Double.parseDouble(output.get(0));
+				else
+					i++;
+				}
+			result = Double.parseDouble(output.get(0));
 		}
+	}
 
 	public void getResult()
 	{
-		String resultForPrint = "";
-		resultForPrint = input + " = " + result;
-		JOptionPane.showMessageDialog(null, resultForPrint);
+		if (!errorInInput)
+		{
+			String resultForPrint = "";
+			resultForPrint = input + " = " + result;
+			JOptionPane.showMessageDialog(null, resultForPrint);
+		}
 	}
 }
