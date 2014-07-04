@@ -67,9 +67,14 @@ public class CalcImplementation //implements calc
 	{
 		Pattern pattern = Pattern.compile("[-]?[0-9]*\\.?[0-9]+");
 		Matcher m = pattern.matcher(input);
+		Pattern patternError = Pattern.compile(".*[+-/*^][+-/*^].*");
+		Matcher m1 = patternError.matcher(input);
 		int posNonDigit = 0;
 		int posBracket = 0;
 		int forError;
+		
+		//if (!m1.find())
+		{
 		
 		for (int i = 0; i < input.length(); i++)
 		{
@@ -81,8 +86,9 @@ public class CalcImplementation //implements calc
 		
 		if (posBracket != 0)
 			makedInput.add(input.substring(0, posBracket));
-	m.find();
-	forError = m.start();
+	if (m.find())
+	{
+		forError = m.start();
 	if (forError == posBracket)
 		{
 			while (posNonDigit < input.length())
@@ -107,6 +113,11 @@ public class CalcImplementation //implements calc
 				{
 					if (input.substring(posNonDigit, input.length()).startsWith(")"))
 						makedInput.add(input.substring(posNonDigit, input.length()));
+					else
+					{
+						errorInInput = true;
+						JOptionPane.showMessageDialog(null, input.substring(0, posNonDigit) + " Error->" + input.substring(posNonDigit, input.length()));
+					}
 					break;
 				}
 			}
@@ -118,7 +129,20 @@ public class CalcImplementation //implements calc
 			JOptionPane.showMessageDialog(null, s);
 		}
 	}
-	
+	else
+	{
+		JOptionPane.showMessageDialog(null, "Error in input");
+		errorInInput = true;
+	}
+		}
+		/*else
+		{
+			errorInInput = true;
+			JOptionPane.showMessageDialog(null, input.substring(0, m1.start()) + " Error->" + m1.group() + "<-Error " + input.substring(m1.end(), input.length()));
+		}
+		*/
+	}
+
 	public void getTranslateInput()
 	{
 		if (!errorInInput)
